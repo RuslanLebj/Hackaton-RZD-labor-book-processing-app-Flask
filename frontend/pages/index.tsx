@@ -1,74 +1,76 @@
 import Head from "next/head";
-import { Inter } from "next/font/google";
 import styles from "@/styles/Home.module.scss";
 import Image from 'next/image'
+import Header from "@/components/header/header";
 import { useRef, useState } from "react";
-import useOutsideClick from "@/hooks/useOutsideClick";
-
-const inter = Inter({ subsets: ["latin"] });
+import Spinner from "@/components/spinner/spinner";
+import { baseUrl } from "@/baseUrl";
+import axios from "axios";
+import { useRouter } from "next/router";
 
 export default function Home() {
 
-  const [activeModel, setActiveModel] = useState('model1')
+  const [isUpload, setIsUpload] = useState<boolean>()
 
-  const models = ['model1', 'model2', 'model3']
+  const inputRef = useRef<HTMLInputElement>(null)
 
-  const [isDisplayModels, setIsDisplayModels] = useState(false)
+  const router = useRouter()
 
-  const listRef = useRef<HTMLDivElement>(null)
+  const handleUploadFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files){
+      return
+    }
+    console.log(e.target.files)
+    const formData = new FormData();
+    formData.append('file', e.target.files[0])
+    try{
+      setIsUpload(false)
+      const {data} = await axios.post<number>(baseUrl + 'upload', formData, {
+        headers: {
+          "accept": "application/json",
+          "Content-type": "multipart/form-data"
+        }
+      })
+      if (data){
+        router.push({
+          pathname: `/archive?id=${data}`
+        })
+      }
+      setIsUpload(true)
+    }catch (error){
+      console.log(error)
+      setIsUpload(undefined)
+    }
+  }
 
-  useOutsideClick(listRef, ()=>{setIsDisplayModels(false)})
+  const onClickUpload = () => {
+    if (inputRef.current){
+      inputRef.current.click()
+    }
+  }
 
   return (
     <>
       <Head>
-        <title>Electronic</title>
-        <meta name="description" content="Electronic" />
+        <title>AIWorkLog Converter</title>
+        <meta name="description" content="AIWorkLog Converter" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={styles.container}>
-        <header className={styles.header}>
-          <h1 className={styles.header__title}>ELECTRONIC</h1>
-          <div ref={listRef} className={styles.header__modelSelectContainer}>
-            <div onClick={()=>{setIsDisplayModels(!isDisplayModels)}} className={styles.header__modelSelect}>
-              <span>{activeModel}</span>
-              <svg width="14" height="7" viewBox="0 0 14 7" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M1 1L7 6L13 1" stroke="red" />
-              </svg>
-            </div>
-            {isDisplayModels && 
-              <div className={styles.header__modelList}>
-                {models.map((model)=>(<p onClick={()=>{setActiveModel(model); setIsDisplayModels(false)}} className={styles.header__modelListPoint} key={model}>{model}</p>))}
-              </div>
-            }
-          </div>  
-          <Image src="/icons/railways.png" width={95} height={55} alt=""/>
-        </header>
+        <Header />
         <main className={styles.main}>
           <div className={styles.main__welcome}>
-              <h1 className={styles.main__title}>Приятно видеть вас снова</h1>
-              <button className={styles.main__search}>
-                <Image src="/icons/stars.svg" width={26} height={26} alt=""/>
-                <span className={styles.main__searchSpan}>Проанализировать запись</span>
-              </button>
-          </div>
-          <div className={styles.main__results}>
-            <h2 className={styles.results__title}>Скачайте результат</h2>
-            <div className={styles.results__links}>
-              <a href='' className={styles.results__result}>
-                  <Image src="/icons/excel.svg" width={26} height={26} alt=""/>
-                  <span className={styles.main__searchSpan}>Excel</span>
-              </a>
-              <a href='' className={styles.results__result}>
-                  <Image src="/icons/csv.png" width={26} height={26} alt=""/>
-                  <span className={styles.main__searchSpan}>CSV</span>
-              </a>
-              <a href='' className={styles.results__result}>
-                  <Image src="/icons/json.png" width={26} height={26} alt=""/>
-                  <span className={styles.main__searchSpan}>JSON</span>
-              </a>
-            </div>
+            <h1 className={styles.main__title}>{isUpload === true ? 'Трудовая книжка успешно загружена' : 'Приятно видеть вас снова'}</h1>
+            {isUpload === undefined && <button className={styles.main__search}>
+              <img src="/icons/stars.svg" width={26} height={26} alt="" />
+              <span onClick={onClickUpload} className={styles.main__searchSpan}>Загрузить трудовую книжку (.zip)</span>
+              <input ref={inputRef} onChange={handleUploadFile} style={{display: 'none'}} type="file" accept='.zip'/>
+            </button>}
+            {isUpload !== undefined && <div className={styles.main__results}>
+              {!isUpload ? <button className={styles.main__search}>
+                <span className={styles.main__searchSpan}>Перейти к редактированию или скачиванию</span></button> : <Spinner />}
+            </div>}
           </div>
         </main>
       </div>

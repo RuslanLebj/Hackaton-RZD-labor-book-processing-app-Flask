@@ -1,0 +1,209 @@
+.container{
+  user-select: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin-bottom: 40px;
+  &:not(:last-child){
+    margin-right: 40px;
+  }
+  &_readOnly{
+    cursor: pointer;
+  }
+}
+
+.content{
+  background-color: #fff;
+  padding: 30px;
+  background-image: url(../../public/backgrounds/book.png);
+}
+
+.title{
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.numbers{
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.series{
+  margin-right: 15px;
+  font-weight: 700;
+}
+
+.number{
+  font-weight: 700;
+}
+
+.field{
+  display: flex;
+  &__name{
+    display: block;
+    margin-right: 15px;
+  }
+  &:not(:last-child){
+    margin-bottom: 15px;
+  }
+}
+
+.input{
+  flex: 1;
+  border-bottom: 1px solid #c7c7c7e7;
+  padding-left: 10px;
+  padding-right: 10px;
+  font-weight: 700;
+  &:focus{
+    border-bottom: 1px solid #000;
+    transition: .4s;
+  }
+}
+
+.pagination{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 15px;
+  &__svg{
+    cursor: pointer;
+    &:hover path{
+      stroke: red;
+    }
+  }
+  &__point{
+    user-select: none;
+    cursor: pointer;
+    &:first-child{
+      margin-left: 10px;
+    }
+    &:last-child{
+      margin-right: 10px;
+    }
+    &:not(:last-child){
+      margin-right: 10px;
+    }
+    &_active{
+      color: red;
+    }
+    &_inactive{
+      color: #fff;
+    }
+  }
+}
+
+.table{
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 2px solid #000;
+  border-collapse: initial;
+  font-weight: 400;
+  &__thBlock{
+    padding-left: 5px;
+    padding-right: 5px;
+    font-weight: 400;
+  }
+  &__thDate{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 180px;
+    &__block{
+      margin-left: -5px;
+      margin-right: -5px;
+      display: flex;
+      border-top: 2px solid #ccc;
+      font-weight: 400;
+    }
+    &__text{
+      width: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-left: 5px;
+      padding-right: 5px;
+      &:first-child{
+        border-right: 2px solid #ccc;
+      }
+      &:last-child{
+        border-left: 2px solid #ccc;
+      }
+    }
+  }
+
+  &__tdBlock{
+    text-align: center;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-weight: 700;
+    border-bottom: 1px solid #c7c7c7e7;
+    width: 100%;
+    &_textarea{
+      width: 100%;
+      height: 100%;
+      font-weight: 700;
+    }
+  }
+  &__tdDate{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    &__block{
+      flex: 1;
+      display: flex;
+      font-weight: 400;
+    }
+    &__text{
+      height: 100%;
+      width: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-left: 5px;
+      padding-right: 5px;
+      &:first-child{
+        border-right: 2px solid #ccc;
+      }
+      &:last-child{
+        border-left: 2px solid #ccc;
+      }
+    }
+  }
+}
+
+.fieldInput{
+  cursor: pointer;
+  display: flex;
+  width: fit-content;
+  height: fit-content;
+}
+
+.save{
+  cursor: pointer;
+  margin-top: 15px;
+  color: #fff;
+  background-color: red;
+  padding: 14px 25px;
+  border-radius: 5px;
+  &:hover{
+    background: rgb(199, 0, 0);
+  }
+}
+
+.allWords{
+  transition: none;
+  &__container{
+    position: absolute;
+    transition: none;
+    background-color: #fff;
+    padding: 30px;
+    background-image: url(../../public/backgrounds/book.png);
+    left: 480px;
+  }
+  &__title{
+    user-select: none;
+  }
+}
