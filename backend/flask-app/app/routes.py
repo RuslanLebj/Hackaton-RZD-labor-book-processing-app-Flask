@@ -1,4 +1,5 @@
 from flask import send_file
+from flask_cors import CORS, cross_origin
 from schemas import *
 from config import *
 from zipfile import ZipFile
@@ -9,6 +10,9 @@ from flask_swagger_ui import get_swaggerui_blueprint
 
 app = Flask(__name__)
 app.config.from_object(Config)
+CORS(app, origins=[
+  'http://localhost:3000',
+])
 UPLOAD_FOLDER = 'uploads'
 
 
@@ -201,7 +205,7 @@ swaggerui_blueprint = get_swaggerui_blueprint(
     app.config['SWAGGER_URL'],
     app.config['API_URL'],
     config={
-        'app_name': "ПАМАГИТИ"
+        'app_name': "SWAGGER"
     }
 )
 
