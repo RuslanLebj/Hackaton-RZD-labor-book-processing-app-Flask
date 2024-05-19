@@ -240,7 +240,7 @@ export default function Book({isReadOnly, onClickBook, content, onSaveBook}:Book
           onMouseUp={handleMouseUp} 
           className={styles.allWords__container}>
           <h2 className={styles.allWords__title}>Все найденные слова</h2>
-          <textarea readOnly className={styles.allWords__textarea}></textarea>
+          <textarea readOnly className={styles.allWords__textarea}>Фамилия Владислав обучение назначен ООО 12  статья 2001</textarea>
         </div>}
     </div>
   )

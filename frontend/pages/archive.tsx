@@ -15,13 +15,13 @@ export default function Archive() {
   const [activeBook, setActiveBook] = useState<BookType>()
 
   const [isEditMode, setIsEditMode] = useState(true)
-
-  const [xlsx, setXlsx] = useState<string>()
   const [json, setJson] = useState<string>()
 
+  const [xlsx, setXlsx] = useState<string>()
+ 
   const params = useParams()
 
-/*   const [books, setBooks] = useState<BookType[]>([
+const [books, setBooks] = useState<BookType[]>([
     {
       "awards": [
         {
@@ -449,9 +449,9 @@ export default function Archive() {
       "series": "SI-I",
       "surname": "Purov"
     }
-  ]) */
+  ])
 
-  const [books, setBooks] = useState<BookType[]>()
+/*   const [books, setBooks] = useState<BookType[]>() */
 
   const getActiveBook = (index: number) => {
     if (!books){
@@ -459,12 +459,15 @@ export default function Archive() {
     }
     console.log(books[index])
     setActiveBook(books[index])
+    handleGetXlsx(books[index].id)
   }
 
   const handleGetXlsx = async (id: number) => {
+    console.log('get xlsx')
     try{
-      const {data} = await axios.get<string>(baseUrl + `data/${id}/xlsx`)
-      setXlsx(data)
+      const response = await axios.get(baseUrl + `/data/${id}/xlsx`, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      setXlsx(url)
     }catch(error){
       console.log(error)
     }
@@ -483,7 +486,6 @@ export default function Archive() {
         const jsonStr = JSON.stringify(data.filter((book)=>(book.id === parseInt(params.id as string)))[0]);
         const blob = new Blob([jsonStr], { type: 'application/json' });
         setJson(URL.createObjectURL(blob));
-        handleGetXlsx(parseInt(params.id as string))
       }
     }catch(error){
       console.log(error)
@@ -493,6 +495,15 @@ export default function Archive() {
   useEffect(()=>{
     handleGetBooks()
   },[])
+
+  useEffect(()=>{
+    if (!isEditMode && activeBook){
+      const jsonStr = JSON.stringify(activeBook);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      setJson(URL.createObjectURL(blob));
+      handleGetXlsx(activeBook.id)
+    }
+  },[isEditMode])
 
   if (!books){
     return <Spinner/>
@@ -526,13 +537,17 @@ export default function Archive() {
                 </div>
                 {isEditMode ? 
                   <Book onSaveBook={()=>{setActiveBook(undefined); handleGetBooks()}} content={activeBook} isReadOnly={false}/> :
-                  xlsx && json ? <div className={styles.results__links}>
+                  json && xlsx ? <div className={styles.results__links}>
                     <a href={xlsx} download className={styles.results__result}>
                       <Image src="/icons/excel.svg" width={26} height={26} alt="" />
                       <span className={styles.main__searchSpan}>Excel</span>
                     </a>
-                    <a href={json} className={styles.results__result}>
-                      <Image src="/icons/json.png" width={26} height={26} alt="" />
+{/*                       <button onClick={()=>{handleGetXlsx(activeBook.id)}} className={styles.results__result} type="submit">
+                        <img src="/icons/excel.svg" width={26} height={26} alt="" />
+                        <span className={styles.main__searchSpan}>Excel</span>
+                      </button> */}
+                    <a download href={json} className={styles.results__result}>
+                      <img src="/icons/json.png" width={26} height={26} alt="" />
                       <span className={styles.main__searchSpan}>JSON</span>
                     </a>
                   </div> : <Spinner/>
