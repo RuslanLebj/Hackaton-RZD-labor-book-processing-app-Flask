@@ -1,7 +1,7 @@
 import json
 import os
 from io import BytesIO
-
+from models import *
 from PIL import Image
 from openpyxl import Workbook
 
@@ -91,3 +91,31 @@ def decode_json(data):
     if isinstance(data, str):
         return json.loads(data, encoding='utf-8')
     return data
+
+
+def update_employee_data(employee, data):
+    employee.series = data.get('series', employee.series)
+    employee.number = data.get('number', employee.number)
+    employee.surname = data.get('surname', employee.surname)
+    employee.name = data.get('name', employee.name)
+    employee.patronymic = data.get('patronymic', employee.patronymic)
+    employee.birth_year = data.get('birth_year', employee.birth_year)
+    employee.document_type = data.get('document_type', employee.document_type)
+    employee.document_series = data.get('document_series', employee.document_series)
+    employee.document_number = data.get('document_number', employee.document_number)
+    employee.document_issue_date = data.get('document_issue_date', employee.document_issue_date)
+    employee.document_issuer = data.get('document_issuer', employee.document_issuer)
+
+
+def insert_job_information(employee_id, job_information):
+    for job_info in job_information:
+        job_info['employee_id'] = employee_id
+        job = JobInformation(**job_info)
+        db.session.add(job)
+
+
+def insert_awards(employee_id, awards):
+    for award_info in awards:
+        award_info['employee_id'] = employee_id
+        award = Award(**award_info)
+        db.session.add(award)
