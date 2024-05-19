@@ -4,7 +4,7 @@ AWARDS = 'awards'
 
 
 class Config:
-    SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://postgres:12345@localhost/pillow'
+    SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://admin:admin@62.84.113.122/pillow'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     CELERY_BROKER_URL = 'redis://localhost:6379/0'
