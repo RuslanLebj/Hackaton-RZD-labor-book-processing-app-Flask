@@ -1,5 +1,4 @@
 from flask import send_file
-from models import JobInformation, Award, db
 from schemas import *
 from config import *
 from zipfile import ZipFile
@@ -10,7 +9,6 @@ from flask_swagger_ui import get_swaggerui_blueprint
 
 app = Flask(__name__)
 app.config.from_object(Config)
-
 UPLOAD_FOLDER = 'uploads'
 
 
@@ -103,8 +101,9 @@ def get_data_json(id):
 @app.route('/all', methods=['GET'])
 def get_all_ids():
     employees = EmployeeModel.query.all()
-    ids = [employee.id for employee in employees]
-    return jsonify({'ids': ids})
+    data = jsonify([employee.to_dict() for employee in employees])
+    data.headers.add('Access-Control-Allow-Origin', '*')
+    return data
 
 
 @app.route('/data/<int:id>/update', methods=['PUT'])
@@ -118,32 +117,14 @@ def update_employee(id):
     if not employee:
         return jsonify({'error': 'Employee not found'}), 404
 
-    employee.series = data.get('series', employee.series)
-    employee.number = data.get('number', employee.number)
-    employee.surname = data.get('surname', employee.surname)
-    employee.name = data.get('name', employee.name)
-    employee.patronymic = data.get('patronymic', employee.patronymic)
-    employee.birth_year = data.get('birth_year', employee.birth_year)
-    employee.document_type = data.get('document_type', employee.document_type)
-    employee.document_series = data.get('document_series', employee.document_series)
-    employee.document_number = data.get('document_number', employee.document_number)
-    employee.document_issue_date = data.get('document_issue_date', employee.document_issue_date)
-    employee.document_issuer = data.get('document_issuer', employee.document_issuer)
-
-
+    update_employee_data(employee, data)
     db.session.commit()
 
     if 'job_information' in data:
-        for job_info in data['job_information']:
-            job_info['employee_id'] = id
-            job = JobInformation(**job_info)
-            db.session.add(job)
+        insert_job_information(id, data['job_information'])
 
     if 'awards' in data:
-        for award_info in data['awards']:
-            award_info['employee_id'] = id
-            award = Award(**award_info)
-            db.session.add(award)
+        insert_awards(id, data['awards'])
 
     db.session.commit()
 
@@ -165,6 +146,55 @@ def get_images(employee_id):
         return jsonify({'error': 'No images found'}), 404
 
     return jsonify({'images': images}), 200
+
+
+@app.route('/data/insert', methods=['POST'])
+def insert_data():
+    data = request.json
+
+    employee = EmployeeModel(
+        series=data['series'],
+        number=data['number'],
+        surname=data['surname'],
+        name=data['name'],
+        patronymic=data['patronymic'],
+        birth_year=data['birth_year'],
+        document_type=data['document_type'],
+        document_series=data['document_series'],
+        document_number=data['document_number'],
+        document_issue_date=data['document_issue_date'],
+        document_issuer=data['document_issuer']
+    )
+    db.session.add(employee)
+    employee = EmployeeModel.query.filter_by(series=data['series'])
+    print(employee.id)
+
+    if 'job_information' in data:
+        for job_info in data['job_information']:
+            job = JobInformation(
+                employee_id=employee.id,
+                admission_date=job_info['admission_date'],
+                dismissal_date=job_info['dismissal_date'],
+                seal_decryption=job_info['seal_decryption'],
+                position_decryption=job_info['position_decryption'],
+                order_number=job_info['order_number']
+            )
+            db.session.add(job)
+
+    if 'awards' in data:
+        for award_info in data['awards']:
+            award = Award(
+                employee_id=employee.id,
+                date=award_info['date'],
+                seal_decryption=award_info['seal_decryption'],
+                awards_information=award_info['awards_information'],
+                order_number=award_info['order_number']
+            )
+            db.session.add(award)
+
+    db.session.commit()
+
+    return jsonify({'message': 'Data inserted successfully'}), 200
 
 
 swaggerui_blueprint = get_swaggerui_blueprint(
