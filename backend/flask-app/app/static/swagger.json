@@ -98,14 +98,14 @@
         }
       }
     },
-    "/status/{task_id}": {
+    "/data/{id}/images": {
       "get": {
         "parameters": [
           {
-            "name": "task_id",
+            "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "integer"
           }
         ],
         "responses": {
